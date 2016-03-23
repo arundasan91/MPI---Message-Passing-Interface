@@ -1,5 +1,7 @@
 #OpenCV Installation Instructions for Ubuntu Trusty
 
+Extracted from [OpenCV - Community Help Wiki](https://help.ubuntu.com/community/OpenCV)
+
 First let us install the dependencies. Building OpenCV can be challenging at first, but if you have all the dependencies correct it will be done in no time.
 
 Go ahead and run the following lines:
