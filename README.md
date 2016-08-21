@@ -1,5 +1,5 @@
 # MPI-Message-Passing-Interface
-### Work in Progress
+
 MPI using Python tutorial.
 
     Basic Bcast, Scatter, Gather on Numpy arrays to Image Processing in multiple nodes.
