@@ -1,4 +1,4 @@
-# Scatter and Gather back images using MPI.
+# Scatter, Gather, process images using MPI: A star-count example.
 <b> Images can be quite large sometimes and handling them can be computationaly intensive. So is videos. The following tutorial will focus on the power of MPI and OpenCV to significantly speed up the processing time required while handling images. </b>
 
 So in Spring 2016, I took a cloud computing + parallel programming course which introduced me to MPI. One of the projects was to parallelize a program which counted the number of stars in a high detail, high pixel density image of the Andromeda Galaxy, a huge JPEG file. One of the task was to find the areas of concern and the areas where the program is actually parallelizable. The other was to get the actual number of stars counted as close as the values from NASA.
@@ -34,7 +34,7 @@ The image file is huge. Our final goal is to count the number of stars in the im
 6.	Reduce the star-count back using sum operation.
 7.	Display the result.
 
-<b>Step 1, 2</b>: Download the image to one node. Let us call it the master node and use `rank` as zero. So only in `rank == 0` read the downloaded image, log time required to read the image. Another timer is stated to find the total time required for the code to execute. The dimensions of the whole image is found out and local dimensions of the image which will be scattered to other nodes are computed. In every case where `rank != 0`, we define the variables as `None`. The variables need to be defined `None` in-order to prevent errors during broadcast and scatter steps in nodes other than master node. The datatype used to define image files is `uint8`.
+<b>Step 1, 2:</b> Download the image to one node. Let us call it the master node and use `rank` as zero. So only in `rank == 0` read the downloaded image, log time required to read the image. Another timer is stated to find the total time required for the code to execute. The dimensions of the whole image is found out and local dimensions of the image which will be scattered to other nodes are computed. In every case where `rank != 0`, we define the variables as `None`. The variables need to be defined `None` in-order to prevent errors during broadcast and scatter steps in nodes other than master node. The datatype used to define image files is `uint8`.
 ```
 if rank == 0:			#LOAD THE IMAGE ONLY IN THE MASTER NODE
 	t1 = MPI.Wtime()	# FIND THE TIME REQUIRED TO LOAD THE IMAGE
@@ -56,7 +56,7 @@ else:
 	local_c = None
 	Inarray = None
 ```
-<b>Step 3, 4</b>: The master node is now set-up. Now, we need to run the `bcast` command in each and every node to broadcast the local image dimensions and then the `Scatterv` command to scatter different chunks of images to different nodes. Note that we use `Scatterv` here to allow irregular image dimensions while scattering. We compute our local image dimensions as `local_r = int(no_rows/size)` and `local_c = int(no_cols/size)` which may not always divide the image equally. So `Scatterv` makes sure that we scatter the entire image regardless of the size. We will define a local chunk of image as `local_x`.
+<b>Step 3, 4:</b> The master node is now set-up. Now, we need to run the `bcast` command in each and every node to broadcast the local image dimensions and then the `Scatterv` command to scatter different chunks of images to different nodes. Note that we use `Scatterv` here to allow irregular image dimensions while scattering. We compute our local image dimensions as `local_r = int(no_rows/size)` and `local_c = int(no_cols/size)` which may not always divide the image equally. So `Scatterv` makes sure that we scatter the entire image regardless of the size. We will define a local chunk of image as `local_x`.
 ```
 ##DO THE REST OF THE CODE IN EVERY NODE##
 t4 = MPI.Wtime()	# START THE TIMER TO FIND THE TIME REQUIRED TO RUN THE CODE
@@ -73,17 +73,17 @@ Now that the image is in respective nodes, we can count the number of stars in e
 local_star_count = np.arange(1)		# DEFINE THE LOCAL AND TOTAL STAR COUNT VARIABLES
 total_star_count = np.arange(1)
 ```
-<b>Step 5</b>: A star in the image is found out by using the adaptiveThreshold method in OpenCV. The following lines of code does the same.
+<b>Step 5:</b> A star in the image is found out by using the adaptiveThreshold method in OpenCV. The following lines of code does the same.
 ```
 img_node_thresh =  cv2.adaptiveThreshold(local_x,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,59,0) # LOGIC TO COUNT STARS
 local_star_count = ((200 < img_node_thresh)).sum()	# LOGIC TO COUNT STARS IN EACH NODE
 ```
-<b>Step 6</b>: Now we have the star-count in each of the nodes. We will go ahead and print these out along with the rank of the node. Then, the total star count is found out using the `Reduce` function and using `MPI.SUM` operation to the master node.
+<b>Step 6:</b> Now we have the star-count in each of the nodes. We will go ahead and print these out along with the rank of the node. Then, the total star count is found out using the `Reduce` function and using `MPI.SUM` operation to the master node.
 ```
 print "Number of stars in Node", rank, "is: ", local_star_count	# PRINT THE VALUE OF STAR COUNT IN EACH NODE
 comm.Reduce(local_star_count, total_star_count, op = MPI.SUM, root = 0)	# REDUCE THE LOCAL STAR COUNTS INTO TOTAL STAR COUNT VARIABLE USING REDUCE FUNCTION
 ```
-<b>Step 7</b>: Finally, in the master node, the timer is stopped, the time is logged and displayed along with the total star-count. The image is displayed, if needed.
+<b>Step 7:</b> Finally, in the master node, the timer is stopped, the time is logged and displayed along with the total star-count. The image is displayed, if needed.
 ```
 if rank == 0:			# IN THE MASTER NODE
 	t5 = MPI.Wtime()	# STOP THE TIMER
@@ -93,3 +93,5 @@ if rank == 0:			# IN THE MASTER NODE
 	#cv2.waitKey(0)
 ```
 
+###Screenshot:
+![alt text](https://github.com/arundasan91/MPI---Message-Passing-Interface/blob/master/Data/screenshot2.png "Screenshot of the output")
