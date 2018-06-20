@@ -1,14 +1,14 @@
-# MPI4Py installation instructions for Ubuntu Trusty.
+# OpenMPI and MPI4py installation instructions for Ubuntu 16.04.
 
 The instructions are to install MPI4Py by building from source. MPI4Py requires OpenMPI or similar <b>mpicc</b> compiler wrapper. So let us first install OpenMPI. 
 For that, download the installation files first.
 
-    wget https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.bz2
+    wget https://download.open-mpi.org/release/open-mpi/v3.1/openmpi-3.1.0.tar.gz
 
 Extract the file and open it.
 
-    tar -zxf openmpi-1.10.2.tar.gz
-    cd openmpi-1.10.2/
+    tar -zxf openmpi-3.1.0.tar.gz
+    cd openmpi-3.1.0/
 
 Configure the installation files by running the following code:
 
@@ -20,27 +20,30 @@ Now, we can make and install the files.
     sudo make install
 
 If there are no errors, OpenMPI is successfully installed. 
-To get the env paths linked correctly, include the following in the .bashrc file.
+To get the env paths linked correctly, include the following in the `.bashrc` file.
 
     export PATH="$PATH:/home/$USER/.openmpi/bin"
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/$USER/.openmpi/lib/"
+    
+Run `source ~/.bashrc` to make the changes available in current session.
 
 Confirm that OpenMPI is successfully installed run:
+    
     mpiexec -V
 
 This will print you the version of MPI installed.
 Good job if you got that right !
 
-Now let us install MPI4Py.
+## Install MPI4Py.
 
 Download the installation files.
 
-    wget https://bitbucket.org/mpi4py/mpi4py/downloads/mpi4py-2.0.0.tar.gz
+    wget https://bitbucket.org/mpi4py/mpi4py/downloads/mpi4py-3.0.0.tar.gz
 
 Extract the file and open it.
 
-    tar -zxf mpi4py-2.0.0.tar.gz
-    cd mpi4py-2.0.0/
+    tar -zxf mpi4py-3.0.0.tar.gz
+    cd mpi4py-3.0.0/
 
 Now we need to build and install the files. For this run these:
 
@@ -48,7 +51,7 @@ Now we need to build and install the files. For this run these:
     sudo python setup.py install
 
 If the build and install process went well, you have MPI4Py successfully installed on your system.
-Now let us confirm that. Run (in the mpi4py-2.0.0 folder):
+Now let us confirm that. Run (in the mpi4py-3.0.0 folder):
 
     mpiexec -n 5 python demo/helloworld.py
 
