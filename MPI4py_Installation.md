@@ -36,6 +36,10 @@ Good job if you got that right !
 
 ## Install MPI4Py.
 
+### Requirements
+    
+    sudo apt-get install libopenmpi-dev python-dev python3-dev
+    
 Download the installation files.
 
     wget https://bitbucket.org/mpi4py/mpi4py/downloads/mpi4py-3.0.0.tar.gz
@@ -49,6 +53,12 @@ Now we need to build and install the files. For this run these:
 
     sudo python setup.py build
     sudo python setup.py install
+
+or use `python3` if required.
+
+    sudo python setup.py build
+    sudo python setup.py install
+
 
 If the build and install process went well, you have MPI4Py successfully installed on your system.
 Now let us confirm that. Run (in the mpi4py-3.0.0 folder):
