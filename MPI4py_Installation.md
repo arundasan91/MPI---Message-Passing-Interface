@@ -56,8 +56,8 @@ Now we need to build and install the files. For this run these:
 
 or use `python3` if required.
 
-    sudo python setup.py build
-    sudo python setup.py install
+    sudo python3 setup.py build
+    sudo python3 setup.py install
 
 
 If the build and install process went well, you have MPI4Py successfully installed on your system.
