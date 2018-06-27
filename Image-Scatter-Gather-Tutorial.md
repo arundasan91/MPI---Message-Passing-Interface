@@ -93,5 +93,43 @@ if rank == 0:			# IN THE MASTER NODE
 	#cv2.waitKey(0)
 ```
 
-###Screenshot:
+### Screenshot:
 ![alt text](https://github.com/arundasan91/MPI---Message-Passing-Interface/blob/master/Data/screenshot2.png "Screenshot of the output")
+
+### Complete Code:
+```
+import numpy as np		# IMPORT 'numpy' LIBRARY AS 'np'
+import cv2			# IMPORT 'cv2' LIBRARY TO WORK WITH IMAGES
+from mpi4py import MPI		# IMPORT 'MPI' FROM 'mpi4py' LIBRARY
+import time			# IMPORT 'time' MODULE
+
+comm = MPI.COMM_WORLD		# DEFINE THE COMMUNICATOR
+size = comm.Get_size()		# FIND THE SIZE OF THE COMMUNICATOR CLASS
+rank = comm.Get_rank()		# FIND THE RANK OF THE CURRENT NODE
+
+##DO THE REST OF THE CODE IN EVERY NODE##
+t4 = MPI.Wtime()	# START THE TIMER TO FIND THE TIME REQUIRED TO RUN THE CODE
+Inarray = comm.bcast(Inarray, root = 0)		# BROADCAST LOCAL IMAGE DIMENSIONS TO EVERY NODE
+#no_rows = comm.bcast(no_rows, root = 0)	# BROADCAST LOCAL IMAGE DIMENSIONS TO EVERY NODE
+#local_c = comm.bcast(local_c, root = 0)
+no_rows = Inarray[0]
+local_c = Inarray[1]
+local_x = np.empty((no_rows, local_c),dtype='uint8')	# DEFINE LOCAL IMAGE ON EVERY NODE
+comm.Scatterv(img,local_x,root = 0)	# SCATTER THE IMAGE TO EVERY NODE
+
+local_star_count = np.arange(1)		# DEFINE THE LOCAL AND TOTAL STAR COUNT VARIABLES
+total_star_count = np.arange(1)
+
+img_node_thresh =  cv2.adaptiveThreshold(local_x,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,59,0) # LOGIC TO COUNT STARS
+local_star_count = ((200 < img_node_thresh)).sum()	# LOGIC TO COUNT STARS IN EACH NODE
+
+print "Number of stars in Node", rank, "is: ", local_star_count	# PRINT THE VALUE OF STAR COUNT IN EACH NODE
+comm.Reduce(local_star_count, total_star_count, op = MPI.SUM, root = 0)	# REDUCE THE LOCAL STAR COUNTS INTO TOTAL STAR COUNT VARIABLE USING REDUCE FUNCTION
+
+if rank == 0:			# IN THE MASTER NODE
+	t5 = MPI.Wtime()	# STOP THE TIMER
+	print "Time required to complete the code is: ", t5-t4 	# PRINT THE TIME REQUIRED TO RUN THE CODE
+	print "Total star count is: ", total_star_count		# PRINT THE TOTAL NUMBER OF STARS
+	#cv2.imshow("galaxy.jpg",img)
+	#cv2.waitKey(0)
+```
